@@ -19,3 +19,6 @@ const friendShipSchema = new Schema({
         },
     }
 })
+
+const Friendship = mongoose.model('Friendship', friendShipSchema)
+module.exports = Friendship

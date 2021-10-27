@@ -8,10 +8,14 @@ router.get('/login',(req,res)=>{
     res.send('login page')
 })
 
+router.get('/haha',(req,res)=>{
+    res.send('haha')
+})
+
 
 router.post("/login", passport.authenticate("local", {
         successRedirect: '/',
-        failureRedirect: '/login',
+        failureRedirect: '/haha',
         successFlash: true,
         failureFlash: true
     })

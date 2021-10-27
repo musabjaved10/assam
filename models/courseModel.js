@@ -14,3 +14,6 @@ const courseSchema = new Schema({
         default:'Compulsory'
     }
 })
+
+const Course = mongoose.model('Course', courseSchema)
+module.exports = Course
