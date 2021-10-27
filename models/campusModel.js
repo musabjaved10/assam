@@ -10,6 +10,9 @@ const campusSchema = new Schema({
     city:{
         type:String,
         required:true
+    },
+    img:{
+        type:String
     }
 })
 

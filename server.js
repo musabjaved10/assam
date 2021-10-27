@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const mongoose = require('mongoose')
-const passport = require('passport')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const path = require('path')
@@ -51,6 +50,17 @@ app.use(session({
 
 
 let loggedIn = false //Initially, user is not logged in. So its false
+
+const isLoggedIn = (req,res,next) => {
+    if (loggedIn){
+        next()
+    }
+    else{
+        req.flash('error', 'Please login')
+        res.redirect('/login')
+    }
+}
+
 // //Configure passport middleware
 app.use((req, res, next) => {
     res.locals.success = req.flash('success'); //Green flash message
@@ -60,7 +70,7 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/', async (req, res) => {
+app.get('/', isLoggedIn,async (req, res) => {
     try {
         const allUsers = await User.find()
         res.render('index', {allUsers})
@@ -70,7 +80,7 @@ app.get('/', async (req, res) => {
     }
 
 })
-app.get('/user/:id', async (req, res) => {
+app.get('/user/:id', isLoggedIn, async (req, res) => {
     try {
         const user = await User.findOne({_id: req.params.id})
 
@@ -104,7 +114,34 @@ app.get('/user/:id', async (req, res) => {
     }
 
 })
-app.get('/login', (req, res) => {
+
+app.get('/teachers', isLoggedIn, async (req, res) => {
+    const sql = `SELECT * FROM teacher_tb`
+
+    try {
+        await db.query(sql, async (err, teachers) => {
+            if (err) {
+                console.log(err)
+            }
+            res.render('teachers', {teachers})
+        })
+
+    } catch (e) {
+        console.log(e)
+        console.log('catch error')
+    }
+
+})
+app.get('/campus/:id', isLoggedIn,async (req,res)=>{
+    try {
+        const campus = await Campus.findOne({_id:req.params.id})
+        res.render('campus', {campus})
+    } catch (e) {
+        console.log(e)
+        res.redirect('/')
+    }
+})
+app.get('/login',  (req, res) => {
     res.render('login')
 })
 
@@ -116,10 +153,8 @@ app.post('/login', async (req, res) => {
     try {
         await db.query(sql, email, async (err, result) => {
             if (err) {
-                console.log('bhoo')
                 console.log(err)
             }
-            console.log(result)
             if (result.length === 0) {
                 req.flash('error', `Invalid email`)
                 return res.redirect(req.headers.referer)
@@ -143,129 +178,14 @@ app.post('/login', async (req, res) => {
 
 })
 
-app.get('/logout', (req, res) => {
+app.get('/logout',  isLoggedIn,(req, res) => {
     req.flash('success', 'Goodbye, See you again!')
     loggedIn = false
     res.redirect('/login')
 })
 
-app.get('/feed', async (req, res) => {
-
-    const data = {
-        friends: [
-            {
-                user_1: {
-                    _id: '617998936597decafd1289ad',
-                    name: 'Frank'
-                },
-                user_2: {
-                    _id: '617998936597decafd1289af',
-                    name: 'Alison'
-                }
-            },
-            {
-                user_1: {
-                    _id: '617998936597decafd1289ad',
-                    name: 'Frank'
-                },
-                user_2: {
-                    _id: '617998936597decafd1289ae',
-                    name: 'Lucy'
-                }
-            },
-            {
-                user_1: {
-                    _id: '617998936597decafd1289b1',
-                    name: 'Johann'
-                },
-                user_2: {
-                    _id: '617998936597decafd1289b2',
-                    name: 'Bob'
-                }
-            },
-            {
-                user_1: {
-                    _id: '617998936597decafd1289b1',
-                    name: 'Johann'
-                },
-                user_2: {
-                    _id: '617998936597decafd1289b0',
-                    name: 'David'
-                }
-            },
-            {
-                user_1: {
-                    _id: '617998936597decafd1289b2',
-                    name: 'Bob'
-                },
-                user_2: {
-                    _id: '617998936597decafd1289b0',
-                    name: 'David'
-                }
-            },
-            {
-                user_1: {
-                    _id: '617998936597decafd1289b2',
-                    name: 'Bob'
-                },
-                user_2: {
-                    _id: '617998936597decafd1289ad',
-                    name: 'Frank'
-                }
-            },
-            {
-                user_1: {
-                    _id: '617998936597decafd1289af',
-                    name: 'Lucy'
-                },
-                user_2: {
-                    _id: '617998936597decafd1289ad',
-                    name: 'Alison'
-                }
-            },
-        ]
-    }
-
-
-    try {
-
-        const createdUsers = await Friend.insertMany(data)
-        console.log('Data feed')
-        process.exit()
-    } catch (e) {
-        console.error(`${e.message}`)
-        process.exit(1)
-    }
-})
-app.get('/data', async (req, res) => {
-    const sql = `INSERT into admin_tb set ?`
-
-    try {
-        const data = {
-            username: 'admin2',
-            first_name: 'Mark',
-            last_name: 'Robert',
-            email: 'mark@admin.com',
-            password: bcrypt.hashSync('password', 10)
-        }
-        await db.query(sql, data, (err, result) => {
-            if (err) {
-                console.log('bhoo')
-                console.log(err)
-
-            }
-            res.send('query executed')
-        })
-
-    } catch (e) {
-        console.log('catch error')
-    }
-
-})
-
-
-app.get('/', (req, res) => {
-    res.render('login')
+app.all('*',(req,res)=>{
+    return res.redirect('/')
 })
 
 

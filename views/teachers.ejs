@@ -40,7 +40,7 @@
             </ul>
 
             <div class="navbar-nav">
-                <a class="nav-link" href="#"><%= currentUser%> </a>
+                <a class="nav-link" href="/logout"><i class="fas fa-user"></i> <%= currentUser%> </a>
             </div>
             <div class="navbar-nav">
                 <a class="nav-link" href="/logout"><i class="fas fa-user"></i> Logout </a>
@@ -48,24 +48,24 @@
         </div>
     </div>
 </nav>
-<%- include("./partials/flash")%>
 
 <div class="container mt-5">
+    <h1 style="color: white">Teachers</h1>
     <table class="table table-primary">
         <thead>
         <tr>
             <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Hobbies</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Campus</th>
         </tr>
         </thead>
         <tbody>
-        <% for (let user of allUsers) {%>
-        <tr>
-            <td><a href="user/<%= user._id%>"><%=user.name%></a> </td>
-            <td><%=user.email%></td>
-            <td><%=user.hobbies%></td>
-        </tr>
+        <% for (let teacher of teachers) {%>
+            <tr>
+                <td><%=teacher.name%></td>
+                <td><%=teacher.subject%></td>
+                <td><a href="/campus/<%=teacher.campus_id%>" class="btn btn-primary">Campus Details</a></td>
+            </tr>
 
         <%}%>
         </tbody>
