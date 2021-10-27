@@ -11,6 +11,8 @@ const bcrypt = require('bcrypt')
 
 const User = require('./models/userModel')
 const Course = require('./models/courseModel')
+const Campus = require('./models/campusModel')
+const
 
 
 mongoose.connect('mongodb://localhost:27017/db_sm_mongo', {
@@ -57,8 +59,25 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/',(req,res)=>{
-    res.render('index')
+app.get('/',async(req,res)=>{
+    try{
+        const allUsers = await User.find()
+        res.render('index',{allUsers})
+    }catch (e){
+        console.log(e)
+        res.redirect('/')
+    }
+
+})
+app.get('/user/:id',async(req,res)=>{
+    try{
+        const user = await User.findOne({_id:req.params.id})
+        res.render('user',{user})
+    }catch (e){
+        console.log(e)
+        res.redirect('/')
+    }
+
 })
 app.get('/login',(req,res)=>{
     res.render('login')
@@ -107,24 +126,14 @@ app.get('/logout', (req, res) => {
 
 app.get('/feed',async (req,res)=> {
 
-    const courses = [
+    const campuses = [
         {
-            name:'history',
+            name:'Campus A',
+            city:'London'
         },
         {
-            name:'geography',
-            courseType:'Optional'
-        },
-        {
-            name:'Maths',
-
-        },
-        {
-            name:'Computer Science',
-            courseType:'Optional'
-        },
-        {
-            name:'Chemistry',
+            name:'Campus B',
+            city:'Chicago'
         },
     ]
 
@@ -132,7 +141,7 @@ app.get('/feed',async (req,res)=> {
 
     try {
 
-        const createdUsers = await Course.insertMany(courses)
+        const createdUsers = await Campus.insertMany(campuses)
         console.log('Data feed')
         process.exit()
     } catch (e) {
