@@ -60,31 +60,55 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/',async(req,res)=>{
-    try{
+app.get('/', async (req, res) => {
+    try {
         const allUsers = await User.find()
-        res.render('index',{allUsers})
-    }catch (e){
+        res.render('index', {allUsers})
+    } catch (e) {
         console.log(e)
         res.redirect('/')
     }
 
 })
-app.get('/user/:id',async(req,res)=>{
-    try{
-        const user = await User.findOne({_id:req.params.id})
-        res.render('user',{user})
-    }catch (e){
+app.get('/user/:id', async (req, res) => {
+    try {
+        const user = await User.findOne({_id: req.params.id})
+
+        const allFriends = await Friend.find({})
+
+        const friends = allFriends[0].friends.filter(person => {
+            return (person.user_1._id === req.params.id) || (person.user_2._id === req.params.id)
+        })
+
+        const sortedFriends=[];
+
+        for(let friend of friends){
+            if(friend.user_1._id !== req.params.id){
+                sortedFriends.push({
+                    user: friend.user_1._id,
+                    name:friend.user_1.name
+                })
+            }
+            if(friend.user_2._id !== req.params.id){
+                sortedFriends.push({
+                    user: friend.user_2._id,
+                    name:friend.user_2.name
+                })
+            }
+        }
+        res.render('user', {user, sortedFriends})
+
+    } catch (e) {
         console.log(e)
         res.redirect('/')
     }
 
 })
-app.get('/login',(req,res)=>{
+app.get('/login', (req, res) => {
     res.render('login')
 })
 
-app.post('/login',async (req,res)=>{
+app.post('/login', async (req, res) => {
     const {email, password} = req.body
     const sql = `SELECT * FROM admin_tb where email= ?`
 
@@ -101,7 +125,7 @@ app.post('/login',async (req,res)=>{
                 return res.redirect(req.headers.referer)
             }
             const isEqual = await bcrypt.compareSync(password, result[0].password);
-            if (!isEqual){
+            if (!isEqual) {
                 req.flash('error', `Invalid Password`)
                 console.log('Invalid password')
                 return res.redirect(req.headers.referer)
@@ -125,7 +149,7 @@ app.get('/logout', (req, res) => {
     res.redirect('/login')
 })
 
-app.get('/feed',async (req,res)=> {
+app.get('/feed', async (req, res) => {
 
     const data = {
         friends: [
@@ -203,7 +227,6 @@ app.get('/feed',async (req,res)=> {
     }
 
 
-
     try {
 
         const createdUsers = await Friend.insertMany(data)
@@ -214,7 +237,7 @@ app.get('/feed',async (req,res)=> {
         process.exit(1)
     }
 })
-app.get('/data',async(req,res)=>{
+app.get('/data', async (req, res) => {
     const sql = `INSERT into admin_tb set ?`
 
     try {
@@ -222,7 +245,7 @@ app.get('/data',async(req,res)=>{
             username: 'admin2',
             first_name: 'Mark',
             last_name: 'Robert',
-            email:'mark@admin.com',
+            email: 'mark@admin.com',
             password: bcrypt.hashSync('password', 10)
         }
         await db.query(sql, data, (err, result) => {
@@ -241,14 +264,13 @@ app.get('/data',async(req,res)=>{
 })
 
 
-app.get('/', (req,res)=>{
+app.get('/', (req, res) => {
     res.render('login')
 })
 
 
-
 const PORT = 3000
 
-app.listen(PORT, ()=> {
+app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
-} )
+})

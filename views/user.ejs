@@ -21,11 +21,19 @@
 <div class="container d-flex justify-content-center align-items-center mt-5">
     <div class="card" style="width: 18rem;">
         <div class="card-body">
-            <h5 class="card-title"><%= user.name %></h5>
+            <h5 class="card-title"><%= user.name %>'s Friends</h5>
             <p class="card-text">
-                <ul>
-                    hey
-                </ul>
+                <% if(sortedFriends){ %>
+                    <div>
+
+                        <% for (let friend of sortedFriends){ %>
+                            <ul>
+                                <a href="/user/<%=friend.user%>"><%=friend.name%></a>
+                            </ul>
+                        <% } %>
+                    </div>
+            <% } %>
+
             </p>
             <a href="/" class="btn btn-primary">Go Back</a>
         </div>
