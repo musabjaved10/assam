@@ -1,5 +1,16 @@
 const express = require("express");
 const app = express();
+const mongoose = require('mongoose')
+
+mongoose.connect('mongodb://localhost:27017/db_sm_mongo', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+const db_mongo = mongoose.connection;
+db_mongo.on("error", console.error.bind(console, 'MongoDB connection error:'));
+db_mongo.once("open", () => {
+    console.log("MongoDB connected successfully")
+});
 
 const db = require('./database/mySQL')
 
