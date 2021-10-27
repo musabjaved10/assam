@@ -9,10 +9,11 @@ const ejsMate = require('ejs-mate')
 const flash = require('connect-flash')
 const bcrypt = require('bcrypt')
 
+
 const User = require('./models/userModel')
 const Course = require('./models/courseModel')
 const Campus = require('./models/campusModel')
-const
+const Friend = require('./models/friendModel')
 
 
 mongoose.connect('mongodb://localhost:27017/db_sm_mongo', {
@@ -126,22 +127,86 @@ app.get('/logout', (req, res) => {
 
 app.get('/feed',async (req,res)=> {
 
-    const campuses = [
-        {
-            name:'Campus A',
-            city:'London'
-        },
-        {
-            name:'Campus B',
-            city:'Chicago'
-        },
-    ]
+    const data = {
+        friends: [
+            {
+                user_1: {
+                    _id: '617998936597decafd1289ad',
+                    name: 'Frank'
+                },
+                user_2: {
+                    _id: '617998936597decafd1289af',
+                    name: 'Alison'
+                }
+            },
+            {
+                user_1: {
+                    _id: '617998936597decafd1289ad',
+                    name: 'Frank'
+                },
+                user_2: {
+                    _id: '617998936597decafd1289ae',
+                    name: 'Lucy'
+                }
+            },
+            {
+                user_1: {
+                    _id: '617998936597decafd1289b1',
+                    name: 'Johann'
+                },
+                user_2: {
+                    _id: '617998936597decafd1289b2',
+                    name: 'Bob'
+                }
+            },
+            {
+                user_1: {
+                    _id: '617998936597decafd1289b1',
+                    name: 'Johann'
+                },
+                user_2: {
+                    _id: '617998936597decafd1289b0',
+                    name: 'David'
+                }
+            },
+            {
+                user_1: {
+                    _id: '617998936597decafd1289b2',
+                    name: 'Bob'
+                },
+                user_2: {
+                    _id: '617998936597decafd1289b0',
+                    name: 'David'
+                }
+            },
+            {
+                user_1: {
+                    _id: '617998936597decafd1289b2',
+                    name: 'Bob'
+                },
+                user_2: {
+                    _id: '617998936597decafd1289ad',
+                    name: 'Frank'
+                }
+            },
+            {
+                user_1: {
+                    _id: '617998936597decafd1289af',
+                    name: 'Lucy'
+                },
+                user_2: {
+                    _id: '617998936597decafd1289ad',
+                    name: 'Alison'
+                }
+            },
+        ]
+    }
 
 
 
     try {
 
-        const createdUsers = await Campus.insertMany(campuses)
+        const createdUsers = await Friend.insertMany(data)
         console.log('Data feed')
         process.exit()
     } catch (e) {
